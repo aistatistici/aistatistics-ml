@@ -16,6 +16,14 @@ def to_float(x):
     return float(x) if x != '' else 0
 
 
+def inverse(x):
+    return 1 / x if x != 0 else x
+
+
+def noop(x):
+    return x
+
+
 csv_init = open_csv(os.path.abspath("./data/balances.csv"))[1:]
 
 for i in range(1, 6):
@@ -36,14 +44,12 @@ for i in range(1, 6):
 
     ax.plot(dates, np.vectorize(to_float)(csv[:, 1]))
 
-
-    ax2.plot(dates, np.vectorize(to_float)(csv[:, 2]))
+    ax2.plot(dates, np.vectorize(noop)(np.vectorize(to_float)(csv[:, 2])), 'r')
 
     # format the ticks
     ax.xaxis.set_major_locator(years)
     ax.xaxis.set_major_formatter(yearsFmt)
     ax.xaxis.set_minor_locator(months)
-
 
     ax2.xaxis.set_major_locator(years)
     ax2.xaxis.set_major_formatter(yearsFmt)
@@ -54,6 +60,7 @@ for i in range(1, 6):
     datemax = np.datetime64(date_fom_str(csv[-1][0]), 'Y') + np.timedelta64(1, 'Y')
     ax.set_xlim(datemin, datemax)
     ax2.set_xlim(datemin, datemax)
+
 
     # format the coords message box
     def price(x):
