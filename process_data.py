@@ -44,7 +44,7 @@ for i in range(1, 6):
 
     ax.plot(dates, np.vectorize(to_float)(csv[:, 1]))
 
-    ax2.plot(dates, np.vectorize(noop)(np.vectorize(to_float)(csv[:, 2])), 'r')
+    ax2.plot(dates, np.vectorize(inverse)(np.vectorize(to_float)(csv[:, 2])), 'r')
 
     # format the ticks
     ax.xaxis.set_major_locator(years)
