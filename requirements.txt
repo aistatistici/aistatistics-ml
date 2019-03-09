@@ -3,3 +3,4 @@ numpy
 scikit-learn
 keras
 pandas
+forex-python==1.3

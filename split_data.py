@@ -1,14 +1,14 @@
 import os
 
+from ml.utils import process_data
 from ml.utils.csv import open_csv_as_data_frame
-from ml.utils.split import split
 
 df = open_csv_as_data_frame(os.path.abspath("./prepared_data/balances.csv"))
 
-subsets = split(df, {
+subsets = process_data(df, {
     "Type": [12, 13],
     "Currency": '__all__'
-})
+}, )
 
 folder = os.path.abspath("./prepared_data/balances")
 for s in subsets:
