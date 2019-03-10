@@ -10,11 +10,10 @@ subsets = process_data(df, {
     "Type": [12, 13],
     "Currency": '__all__'
 }, {
-    "Date": 1
 }, {
     "Avg Rate (for Balance)": 'inverse',
     "Balance": 'min_max_normalization'
-}, "Date")
+}, "Date", ["Date"])
 
 folder = os.path.abspath("./prepared_data/balances")
 for d, (s, _) in subsets:
