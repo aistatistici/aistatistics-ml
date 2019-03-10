@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from ml.utils.csv import open_csv
+from ml.utils.csv import open_csv_as_data_frame
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -24,55 +24,47 @@ def noop(x):
     return x
 
 
-csv_init = open_csv(os.path.abspath("./data/balances.csv"))[1:]
+csv = open_csv_as_data_frame(os.path.abspath('./prepared_data/balances/balance_Type_12_Currency_3.csv'))
 
-for i in range(1, 6):
-    csv = csv_init[csv_init[:, 3] == '12']
-    csv = csv[csv[:, 4] == str(i)]
-    # csv = csv[csv[:, 1].astype(float) > 0]
-    csv = csv[sorted(np.unique(csv[:, 0], return_index=True)[1])]
+years = mdates.YearLocator()  # every year
+months = mdates.MonthLocator()  # every month
+yearsFmt = mdates.DateFormatter('%Y')
 
-    years = mdates.YearLocator()  # every year
-    months = mdates.MonthLocator()  # every month
-    yearsFmt = mdates.DateFormatter('%Y')
+fig, ax = plt.subplots()
 
-    fig, ax = plt.subplots()
+ax2 = ax.twinx()
 
-    ax2 = ax.twinx()
+ax.plot(csv['Date'].values, csv['Balance'].values)
 
-    dates = np.vectorize(date_fom_str)(csv[:, 0])
+ax2.plot(csv['Date'].values, csv['Avg Rate (for Balance)'].values, 'r')
 
-    ax.plot(dates, np.vectorize(to_float)(csv[:, 1]))
+# format the ticks
+ax.xaxis.set_major_locator(years)
+ax.xaxis.set_major_formatter(yearsFmt)
+ax.xaxis.set_minor_locator(months)
 
-    ax2.plot(dates, np.vectorize(inverse)(np.vectorize(to_float)(csv[:, 2])), 'r')
+ax2.xaxis.set_major_locator(years)
+ax2.xaxis.set_major_formatter(yearsFmt)
+ax2.xaxis.set_minor_locator(months)
 
-    # format the ticks
-    ax.xaxis.set_major_locator(years)
-    ax.xaxis.set_major_formatter(yearsFmt)
-    ax.xaxis.set_minor_locator(months)
-
-    ax2.xaxis.set_major_locator(years)
-    ax2.xaxis.set_major_formatter(yearsFmt)
-    ax2.xaxis.set_minor_locator(months)
-
-    # round to nearest years...
-    datemin = np.datetime64(date_fom_str(csv[0][0]), 'Y')
-    datemax = np.datetime64(date_fom_str(csv[-1][0]), 'Y') + np.timedelta64(1, 'Y')
-    ax.set_xlim(datemin, datemax)
-    ax2.set_xlim(datemin, datemax)
+# round to nearest years...
+datemin = np.datetime64(csv['Date'].values[0], 'Y')
+datemax = np.datetime64(csv['Date'].values[-1], 'Y') + np.timedelta64(1, 'Y')
+ax.set_xlim(datemin, datemax)
+ax2.set_xlim(datemin, datemax)
 
 
-    # format the coords message box
-    def price(x):
-        return '$%1.2f' % x
+# format the coords message box
+def price(x):
+    return '$%1.2f' % x
 
 
-    ax.format_xdata = mdates.DateFormatter('%Y-%m-%d')
-    ax.format_ydata = price
-    ax.grid(True)
+ax.format_xdata = mdates.DateFormatter('%Y-%m-%d')
+ax.format_ydata = price
+ax.grid(True)
 
-    # rotates and right aligns the x labels, and moves the bottom of the
-    # axes up to make room for them
-    fig.autofmt_xdate()
+# rotates and right aligns the x labels, and moves the bottom of the
+# axes up to make room for them
+fig.autofmt_xdate()
 
-    plt.show()
+plt.show()

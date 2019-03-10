@@ -6,11 +6,15 @@ import pandas as pd
 
 
 def min_max_normalization(data: np.ndarray):
-    tmp = data.sort()
-    mi = data[int(10 / 100 * tmp.size)]
-    ma = data[int(90 / 100 * tmp.size)]
+    tmp = np.sort(data)
+    mi = tmp[0]
+    ma = tmp[-1]
 
-    return (data - mi) / (ma - mi), {
+    i = ma - mi
+
+    mi = mi + i * 10 / 100
+    ma = ma - i * 10 / 100
+    return (data - mi) / i, {
         'min': mi,
         'max': ma
     }
@@ -35,5 +39,5 @@ PROCESS_MAP = {
 def process(df: pd.DataFrame, columns: Dict[str, str]):
     column_data = {}
     for col, f in columns.items():
-        df[col], column_data[col] = PROCESS_MAP[f](df[col])
+        df[col], column_data[col] = PROCESS_MAP[f](df[col].values)
     return df, column_data

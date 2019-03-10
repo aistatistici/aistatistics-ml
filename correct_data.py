@@ -21,6 +21,7 @@ csv_init = open_csv(os.path.abspath("./data/balances.csv"))
 
 head = csv_init[0]
 data = csv_init[1:]
+data = data[data[:, 1].astype(float) > 0]
 
 data_processed = {}
 
