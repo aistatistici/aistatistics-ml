@@ -7,5 +7,5 @@ def open_csv(path):
         return np.array([l.strip().split(',') for l in f.readlines()])
 
 
-def open_csv_as_data_frame(path, date_columns=[]):
+def open_csv_as_data_frame(path, date_columns=None):
     return pd.read_csv(path, parse_dates=date_columns, infer_datetime_format=True)
