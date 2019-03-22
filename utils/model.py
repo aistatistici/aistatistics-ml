@@ -2,6 +2,16 @@ import numpy as np
 import pandas as pd
 from keras import Sequential
 from keras.layers import LSTM, Dense
+from matplotlib import pyplot
+
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+try:  # Python 3
+    from urllib.parse import quote
+except ImportError:  # Python 2
+    from urllib import quote
+from base64 import b64encode
+from io import BytesIO
 
 
 def dataset_to_time_series(df: pd.DataFrame, n_in, n_out, n_out_columns, dropnan=True):
@@ -46,7 +56,7 @@ def split_data(df: pd.DataFrame, n_features, n_in, n_out, n_out_columns, ratio=0
     values = df.values
     # np.random.shuffle(values)
     nr_out = len(n_out_columns)
-    train_count = int(values.shape[0] * 80 / 100)
+    train_count = int(values.shape[0] * ratio)
     train = values[:train_count, :]
     test = values[train_count:, :]
     # split into input and outputs
@@ -69,8 +79,8 @@ def generate_model(n_features, n_in, n_out, n_out_columns):
     return model
 
 
-def train_model(model, train_X, train_y, test_X, test_y):
-    return model.fit(train_X, train_y, epochs=200, batch_size=72, validation_data=(test_X, test_y), shuffle=False)
+def train_model(model, train_X, train_y, test_X, test_y, epochs=100):
+    return model.fit(train_X, train_y, epochs=epochs, batch_size=72, validation_data=(test_X, test_y), shuffle=False)
 
 
 def predict(model, test_X, n_features, n_in, with_ground_truth=True):
@@ -87,3 +97,34 @@ def predict(model, test_X, n_features, n_in, with_ground_truth=True):
         return np.asarray(preds)
     else:
         return model.predict(test_X)
+
+
+def render_history_graph(history):
+    pyplot.clf()
+    pyplot.plot(history.history['loss'], label='train')
+    pyplot.plot(history.history['val_loss'], label='test')
+    pyplot.legend()
+
+    canvas = FigureCanvas(pyplot.gcf())
+
+    png_output = BytesIO()
+    canvas.print_png(png_output)
+    data = b64encode(png_output.getvalue()).decode('ascii')
+    data_url = 'data:image/png;base64,{}'.format(quote(data))
+
+    return data_url
+
+
+def render_predictions(preds, labels):
+    pyplot.clf()
+    pyplot.plot(preds[:, 0], label='prediction')
+    pyplot.plot(labels[:, 0], 'r', label='ground_truth')
+    pyplot.legend()
+
+    canvas = FigureCanvas(pyplot.gcf())
+
+    png_output = BytesIO()
+    canvas.print_png(png_output)
+    data = b64encode(png_output.getvalue()).decode('ascii')
+    data_url = 'data:image/png;base64,{}'.format(quote(data))
+    return data_url
