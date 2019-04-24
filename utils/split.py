@@ -31,4 +31,4 @@ def split_column(df: pd.DataFrame, extra: Dict[str, Any], key: str, values: Spli
         dfs = dfs.drop(columns=[key], axis=1)
         subsets.append((dict([(key, v)], **extra), dfs))
 
-    return subsets
+    return subsets if len(subsets) > 0 else [(dict(**extra), df)]

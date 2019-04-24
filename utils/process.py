@@ -39,5 +39,8 @@ PROCESS_MAP = {
 def process(df: pd.DataFrame, columns: Dict[str, str]):
     column_data = {}
     for col, f in columns.items():
-        df[col], column_data[col] = PROCESS_MAP[f](df[col].values)
+        df[col], tmp = PROCESS_MAP[f](df[col].values)
+        column_data[col] = {
+            'process': dict([(f, tmp)])
+        }
     return df, column_data
